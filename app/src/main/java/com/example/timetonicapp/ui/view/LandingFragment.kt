@@ -1,4 +1,4 @@
-package com.example.timetonicapp.ui
+package com.example.timetonicapp.ui.view
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
