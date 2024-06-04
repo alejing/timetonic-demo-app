@@ -25,5 +25,8 @@
         <argument
             android:name="sesskey"
             app:argType="string" />
+        <argument
+            android:name="ou"
+            app:argType="string" />
     </fragment>
 </navigation>

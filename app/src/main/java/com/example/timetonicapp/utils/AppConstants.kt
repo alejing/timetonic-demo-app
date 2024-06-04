@@ -7,4 +7,5 @@ object AppConstants {
     const val REQ_APPKEY = "createAppkey"
     const val REQ_OAUTHKEY = "createOauthkey"
     const val REQ_SESSKEY = "createSesskey"
+    const val REQ_GET_ALL_BOOKS = "getAllBooks"
 }

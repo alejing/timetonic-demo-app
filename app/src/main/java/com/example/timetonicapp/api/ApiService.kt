@@ -1,6 +1,7 @@
 package com.example.timetonicapp.api
 
 import com.example.timetonicapp.model.AppKeyResponse
+import com.example.timetonicapp.model.BookResponse
 import com.example.timetonicapp.model.OauthKeyResponse
 import com.example.timetonicapp.model.SessKeyResponse
 import retrofit2.Call
@@ -9,7 +10,6 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
 interface ApiService {
-
 
     @FormUrlEncoded
     @POST("/live/api.php")
@@ -38,4 +38,14 @@ interface ApiService {
         @Field("u_c") uc: String,
         @Field("oauthkey") oauthkey: String,
     ): Call<SessKeyResponse>
+
+    @FormUrlEncoded
+    @POST("/live/api.php")
+    fun getAllBooks(
+        @Field("version") version: String,
+        @Field("req") req: String,
+        @Field("o_u") ou: String,
+        @Field("u_c") uc: String,
+        @Field("sesskey") sesskey: String,
+    ): Call<BookResponse>
 }

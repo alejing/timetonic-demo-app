@@ -10,6 +10,8 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.Navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.example.timetonicapp.R
 import com.example.timetonicapp.ui.viemodel.LoginViewModel
 import com.example.timetonicapp.utils.isNetworkAvailable
@@ -52,18 +54,19 @@ class LoginFragment : Fragment() {
         viewModel.setAuthCallback(object : LoginViewModel.AuthCallback {
 
             override fun onAuthSuccess(message: String, ou: String, sesskey: String) {
-                progressBar.visibility = View.GONE
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                 // Go to LandingFragment
-//                val action =
-//                com.example.timetonicapp.ui.LoginFragmentDirections.actionLoginFragmentToLandingFragment(
-//                    "Test"
-//                )
-//            findNavController().navigate(action)
+                progressBar.visibility = View.GONE
+                //Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                val action =
+                com.example.timetonicapp.ui.view.LoginFragmentDirections.actionLoginFragmentToLandingFragment(
+                    sesskey,
+                    ou
+                )
+                findNavController().navigate(action)
             }
 
             override fun onAuthError(error: String) {
-                // Manejar error de autenticación
+                // Handle authentication error
                 progressBar.visibility = View.GONE
                 //Toast.makeText(context, error, Toast.LENGTH_LONG).show()
                 showErrorDialog(error)
@@ -71,16 +74,17 @@ class LoginFragment : Fragment() {
         })
 
         loginButton.setOnClickListener {
-            // Start the authentication process
+
             progressBar.visibility = View.VISIBLE
 
+            // Check if there is an internet connection
             if (!isNetworkAvailable(this.requireContext())) {
                 showErrorDialog("No internet connection")
                 // Ocultar el ProgressBar si hay un error
                 progressBar.visibility = View.GONE
                 return@setOnClickListener
             }
-
+            // Start the authentication process
             viewModel.startAuthentication("android.developer@timetonic.com", "Android.developer1")
         }
     }

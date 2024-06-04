@@ -3,8 +3,11 @@ package com.example.timetonicapp.repository
 import android.content.Context
 import com.example.timetonicapp.api.RetrofitInstance
 import com.example.timetonicapp.model.AppKeyResponse
+import com.example.timetonicapp.model.BookItem
+import com.example.timetonicapp.model.BookResponse
 import com.example.timetonicapp.model.OauthKeyResponse
 import com.example.timetonicapp.model.SessKeyResponse
+import com.example.timetonicapp.utils.isNetworkAvailable
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -18,10 +21,10 @@ class AppRepository(private val context: Context) {
         appname: String,
         onSuccess: (String) -> Unit, onFailure: (Throwable) -> Unit) {
 
-//        if (!isNetworkAvailable(context)) {
-//            onFailure(Exception("No internet connection"))
-//            return
-//        }
+        if (!isNetworkAvailable(context)) {
+            onFailure(Exception("No internet connection"))
+            return
+        }
 
         RetrofitInstance.api.createAppkey(version, req, appname).enqueue(object :
             Callback<AppKeyResponse> {
@@ -56,10 +59,10 @@ class AppRepository(private val context: Context) {
         appKey: String,
         onSuccess: (String, String) -> Unit, onFailure: (Throwable) -> Unit) {
 
-//        if (!isNetworkAvailable(context)) {
-//            onFailure(Exception("No internet connection"))
-//            return
-//        }
+        if (!isNetworkAvailable(context)) {
+            onFailure(Exception("No internet connection"))
+            return
+        }
 
         RetrofitInstance.api.createOauthkey(version, req, login, pwd, appKey).enqueue(object : Callback<OauthKeyResponse> {
             override fun onResponse(call: Call<OauthKeyResponse>, response: Response<OauthKeyResponse>) {
@@ -91,10 +94,10 @@ class AppRepository(private val context: Context) {
         oauthKey: String,
         onSuccess: (String) -> Unit, onFailure: (Throwable) -> Unit) {
 
-//        if (!isNetworkAvailable(context)) {
-//            onFailure(Exception("No internet connection"))
-//            return
-//        }
+        if (!isNetworkAvailable(context)) {
+            onFailure(Exception("No internet connection"))
+            return
+        }
 
         RetrofitInstance.api.createSesskey(version, req, ou, uc, oauthKey).enqueue(object : Callback<SessKeyResponse> {
             override fun onResponse(call: Call<SessKeyResponse>, response: Response<SessKeyResponse>) {
@@ -111,6 +114,36 @@ class AppRepository(private val context: Context) {
             }
 
             override fun onFailure(call: Call<SessKeyResponse>, t: Throwable) {
+                onFailure(t)
+            }
+        })
+    }
+
+    fun getAllBooks(
+        version: String,
+        req: String,
+        ou: String,
+        sessKey: String,
+        onSuccess: (List<BookItem>) -> Unit, onFailure: (Throwable) -> Unit) {
+
+        if (!isNetworkAvailable(context)) {
+            onFailure(Exception("No internet connection"))
+            return
+        }
+
+        RetrofitInstance.api.getAllBooks(version, req, ou, ou, sessKey).enqueue(object : Callback<BookResponse> {
+            override fun onResponse(call: Call<BookResponse>, response: Response<BookResponse>) {
+                if (response.isSuccessful) {
+                    val books = response.body()?.allBooks?.books?.map { book ->
+                        BookItem(book.fpForm.name, book.ownerPrefs.oCoverImg)
+                    }?: emptyList()
+                    onSuccess(books)
+                } else {
+                    onFailure(Exception("Failed to create the list of books"))
+                }
+            }
+
+            override fun onFailure(call: Call<BookResponse>, t: Throwable) {
                 onFailure(t)
             }
         })

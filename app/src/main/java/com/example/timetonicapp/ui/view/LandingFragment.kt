@@ -9,18 +9,25 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.timetonicapp.R
+import com.example.timetonicapp.ui.viemodel.LandingViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 
 class LandingFragment : Fragment() {
+
+    private lateinit var viewModel: LandingViewModel
+    private var ou: String? = null
+    private var sesskey: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,13 +57,13 @@ class LandingFragment : Fragment() {
         val toolbarTitle: TextView = view.findViewById(R.id.toolbar_title)
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
 
-        // Desactivar el título por defecto
+        // Deactivate the default appbar title
         (activity as AppCompatActivity).supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        // Configurar el título personalizado
+        // Configure the title personalized text
         toolbarTitle.text = "Landing Page"
 
-        // Configurar el menú
+        // Configure the menu
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -66,7 +73,7 @@ class LandingFragment : Fragment() {
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
                     R.id.action_logout -> {
-                        // Manejar el clic en el ítem de logout
+                        // Handle logout action
                         showExitDialog()
                         true
                     }
@@ -75,12 +82,18 @@ class LandingFragment : Fragment() {
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
+        viewModel = ViewModelProvider(this)[LandingViewModel::class.java]
+
+        // Catching the arguments by the safe args from the Login
         arguments?.let {
             val args = LandingFragmentArgs.fromBundle(it)
-            val sesskey = args.sesskey
-            // Ahora puedes usar el username, por ejemplo, mostrarlo en un TextView
-            val textView: TextView = view.findViewById(R.id.textView)
-            textView.text = sesskey
+            //this.sesskey = args.sesskey
+            //this.ou = args.ou
+            viewModel.loadBooksItems(args.ou, args.sesskey)
+        }
+
+        viewModel.books.observe(viewLifecycleOwner) { books ->
+            Toast.makeText(context, books.toString(), Toast.LENGTH_LONG).show()
         }
 
     }
