@@ -135,7 +135,10 @@ class AppRepository(private val context: Context) {
             override fun onResponse(call: Call<BookResponse>, response: Response<BookResponse>) {
                 if (response.isSuccessful) {
                     val books = response.body()?.allBooks?.books?.map { book ->
-                        BookItem(book.fpForm.name, book.ownerPrefs.oCoverImg)
+                        val name = book.fpForm.name ?: "No name available."
+                        val description = book.description ?: "No description available."
+                        val urlImage = book.ownerPrefs.oCoverImg ?: "null"
+                        BookItem(name, urlImage, description)
                     }?: emptyList()
                     onSuccess(books)
                 } else {

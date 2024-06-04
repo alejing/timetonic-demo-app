@@ -1,3 +1,3 @@
 package com.example.timetonicapp.model
 
-data class BookItem(val name: String, val urlImage: String)
+data class BookItem(val name: String, val urlImage: String, val description: String)

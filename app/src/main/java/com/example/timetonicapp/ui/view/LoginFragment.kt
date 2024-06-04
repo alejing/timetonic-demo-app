@@ -7,10 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.example.timetonicapp.R
 import com.example.timetonicapp.ui.viemodel.LoginViewModel
@@ -25,11 +23,11 @@ class LoginFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Interceptar el evento de retroceso
+        // Intercept the back button event
         val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                // Aquí puedes manejar el evento de retroceso
-                // Dejar el cuerpo vacío deshabilitará la navegación hacia atrás
+                // Here you can handle the back event
+                // Leaving the body empty will disable back navigation
             }
         }
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
@@ -58,7 +56,7 @@ class LoginFragment : Fragment() {
                 progressBar.visibility = View.GONE
                 //Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                 val action =
-                com.example.timetonicapp.ui.view.LoginFragmentDirections.actionLoginFragmentToLandingFragment(
+                LoginFragmentDirections.actionLoginFragmentToLandingFragment(
                     sesskey,
                     ou
                 )
@@ -80,7 +78,7 @@ class LoginFragment : Fragment() {
             // Check if there is an internet connection
             if (!isNetworkAvailable(this.requireContext())) {
                 showErrorDialog("No internet connection")
-                // Ocultar el ProgressBar si hay un error
+                // Hide the progress bar when something went wrong
                 progressBar.visibility = View.GONE
                 return@setOnClickListener
             }

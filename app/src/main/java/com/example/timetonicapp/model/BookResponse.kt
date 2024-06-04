@@ -26,7 +26,7 @@ data class Book(
     val del: Boolean,
     val hideMessage: String,
     val hideBookMembers: String,
-    val description: String,
+    val description: String?,
     val defaultTemplate: String,
     val isDownloadable: Boolean,
     val canDisableSync: Boolean,
@@ -63,7 +63,7 @@ data class Member(
 
 data class FpForm(
     val fpid: Long,
-    val name: String,
+    val name: String?,
     val lastModified: Long,
 )
 
@@ -127,7 +127,7 @@ data class OwnerPrefs(
     val fpAutoExport: Boolean,
     val oCoverColor: String,
     val oCoverUseLastImg: Boolean,
-    val oCoverImg: String,
+    val oCoverImg: String?,
     val oCoverType: String,
     val authorizeMemberBroadcast: Boolean,
     val acceptExternalMsg: Boolean,

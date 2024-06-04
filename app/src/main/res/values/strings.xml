@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TimeTonicApp</string>
+    <string name="tool_bar_landing_page_title">Landing Page</string>
 </resources>

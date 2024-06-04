@@ -18,6 +18,8 @@ import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.timetonicapp.R
 import com.example.timetonicapp.ui.viemodel.LandingViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -26,17 +28,18 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class LandingFragment : Fragment() {
 
     private lateinit var viewModel: LandingViewModel
-    private var ou: String? = null
-    private var sesskey: String? = null
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: LandingAdapter
+    private lateinit var progressBar: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Interceptar el evento de retroceso
+        // Intercept the back button event
         val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                // Aquí puedes manejar el evento de retroceso
-                // Dejar el cuerpo vacío deshabilitará la navegación hacia atrás
+                // Here you can handle the back event
+                // Leaving the body empty will disable back navigation
             }
         }
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
@@ -61,7 +64,7 @@ class LandingFragment : Fragment() {
         (activity as AppCompatActivity).supportActionBar?.setDisplayShowTitleEnabled(false)
 
         // Configure the title personalized text
-        toolbarTitle.text = "Landing Page"
+        toolbarTitle.text = getString(R.string.tool_bar_landing_page_title)
 
         // Configure the menu
         val menuHost: MenuHost = requireActivity()
@@ -82,18 +85,36 @@ class LandingFragment : Fragment() {
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
+        // Configure the ViewModel
         viewModel = ViewModelProvider(this)[LandingViewModel::class.java]
+
+        // Add the recycler view
+        recyclerView = view.findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(context)
+
+        // Connecting the adapter to the recycler view
+        adapter = LandingAdapter()
+        recyclerView.adapter = adapter
+
+        progressBar = view.findViewById(R.id.progress_bar)
 
         // Catching the arguments by the safe args from the Login
         arguments?.let {
             val args = LandingFragmentArgs.fromBundle(it)
-            //this.sesskey = args.sesskey
-            //this.ou = args.ou
+            // Pass the arguments sesskey and ou to the ViewModel
             viewModel.loadBooksItems(args.ou, args.sesskey)
         }
 
+        // Observe the books from the view model and submit it to the adapter
         viewModel.books.observe(viewLifecycleOwner) { books ->
-            Toast.makeText(context, books.toString(), Toast.LENGTH_LONG).show()
+            //Toast.makeText(context, books.toString(), Toast.LENGTH_LONG).show()
+            adapter.submitList(books)
+        }
+
+        // Observe the isLoading LiveData
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+            recyclerView.visibility = if (isLoading) View.GONE else View.VISIBLE
         }
 
     }
