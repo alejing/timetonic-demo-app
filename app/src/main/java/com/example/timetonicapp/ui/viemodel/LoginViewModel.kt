@@ -5,17 +5,24 @@ import androidx.lifecycle.AndroidViewModel
 import com.example.timetonicapp.repository.AppRepository
 import com.example.timetonicapp.utils.AppConstants
 
+/**
+ * ViewModel for the Login screen.
+ */
 class LoginViewModel (application: Application): AndroidViewModel(application){
 
+    // // Instantiate the repository
     private val repository = AppRepository(application.applicationContext)
 
+    // Authentication callback
     interface AuthCallback {
         fun onAuthSuccess(message: String, ou: String, sesskey: String)
         fun onAuthError(error: String)
     }
 
+    // Callback variable
     private var authCallback: AuthCallback? = null
 
+    // Set callback variable
     fun setAuthCallback(callback: AuthCallback?) {
         this.authCallback = callback
     }
@@ -25,6 +32,7 @@ class LoginViewModel (application: Application): AndroidViewModel(application){
         createAppKey(login, password)
     }
 
+    // Create appKey with login and password parameters
     private fun createAppKey(login: String, password: String) {
         // Call createAppKey
         repository.createAppKey(AppConstants.VERSION, AppConstants.REQ_APPKEY, AppConstants.APP_NAME, { appKey ->
@@ -35,6 +43,7 @@ class LoginViewModel (application: Application): AndroidViewModel(application){
         })
     }
 
+    // Create oauthKey with login, password and appKey parameters
     private fun createOauthKey(login: String, password: String, appKey: String) {
         // Call createOauthKey
         repository.createOauthKey(AppConstants.VERSION, AppConstants.REQ_OAUTHKEY, login, password, appKey, { oauthKey, ou ->
@@ -45,6 +54,7 @@ class LoginViewModel (application: Application): AndroidViewModel(application){
         })
     }
 
+    // Create session key with oauthKey and ou parameter
     private fun createSessKey(ou: String, oauthKey: String) {
         repository.createSessKey(AppConstants.VERSION, AppConstants.REQ_SESSKEY, ou, ou, oauthKey, { sessKey ->
             // sessKey created successfully
@@ -55,6 +65,7 @@ class LoginViewModel (application: Application): AndroidViewModel(application){
         })
     }
 
+    // Clean up the callback
     override fun onCleared() {
         super.onCleared()
         authCallback = null

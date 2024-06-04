@@ -9,7 +9,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -18,15 +17,21 @@ import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.timetonicapp.R
 import com.example.timetonicapp.ui.viemodel.LandingViewModel
+import com.example.timetonicapp.utils.isNetworkAvailable
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 
+/**
+ * Fragment representing the Landing screen.
+ */
 class LandingFragment : Fragment() {
 
+    // Variables declaration
     private lateinit var viewModel: LandingViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: LandingAdapter
@@ -56,6 +61,7 @@ class LandingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Configure the toolbar
         val toolbar: Toolbar = view.findViewById(R.id.toolbar)
         val toolbarTitle: TextView = view.findViewById(R.id.toolbar_title)
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
@@ -66,7 +72,7 @@ class LandingFragment : Fragment() {
         // Configure the title personalized text
         toolbarTitle.text = getString(R.string.tool_bar_landing_page_title)
 
-        // Configure the menu
+        // Configure the menu on the toolbar
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -100,12 +106,21 @@ class LandingFragment : Fragment() {
 
         // Catching the arguments by the safe args from the Login
         arguments?.let {
+
             val args = LandingFragmentArgs.fromBundle(it)
+
+            // Check if there is an internet connection
+            if (!isNetworkAvailable(this.requireContext())) {
+                showErrorDialog("No internet connection")
+                // Hide the progress bar when something went wrong
+                progressBar.visibility = View.GONE
+                return
+            }
             // Pass the arguments sesskey and ou to the ViewModel
             viewModel.loadBooksItems(args.ou, args.sesskey)
         }
 
-        // Observe the books from the view model and submit it to the adapter
+        // Observe the list of books from the view model and submit it to the adapter
         viewModel.books.observe(viewLifecycleOwner) { books ->
             //Toast.makeText(context, books.toString(), Toast.LENGTH_LONG).show()
             adapter.submitList(books)
@@ -117,8 +132,14 @@ class LandingFragment : Fragment() {
             recyclerView.visibility = if (isLoading) View.GONE else View.VISIBLE
         }
 
+        // Observe the errorMessage LiveData
+        viewModel.errorMessage.observe(viewLifecycleOwner){ errorMessage ->
+            showErrorDialog(errorMessage)
+        }
+
     }
 
+    // Show the exit dialog
     private fun showExitDialog() {
 
         MaterialAlertDialogBuilder(requireContext(), R.style.CustomAlertDialog)
@@ -130,6 +151,18 @@ class LandingFragment : Fragment() {
             }
             .setNegativeButton("No") { dialog, _ ->
                 // Respond to negative button press
+                dialog.dismiss()
+            }.show()
+    }
+
+    // Show the error dialog
+    private fun showErrorDialog(message: String?) {
+
+        MaterialAlertDialogBuilder(requireContext(), R.style.CustomAlertDialog)
+            .setTitle("Oops, something went wrong")
+            .setMessage(message)
+            .setPositiveButton("I understand")  { dialog, _ ->
+                // Respond to positive button press
                 dialog.dismiss()
             }.show()
     }

@@ -1,5 +1,12 @@
 package com.example.timetonicapp.model
 
+
+/**
+ * Data class representing the complete response from the getAllBooks endpoint of the TimeTonics API.
+ * Properties important to track: ownerPrefs.title - The title of the book.
+ *                                ownerPrefs.oCoverImg - The cover image of the book.
+ *                                description - The description of the book.
+ */
 data class BookResponse(
     val status: String,
     val sstamp: Long,
@@ -131,7 +138,7 @@ data class OwnerPrefs(
     val oCoverType: String,
     val authorizeMemberBroadcast: Boolean,
     val acceptExternalMsg: Boolean,
-    val title: String,
+    val title: String?,
     val notifyMobileConfidential: Boolean,
 )
 

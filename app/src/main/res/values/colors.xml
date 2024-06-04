@@ -6,4 +6,5 @@
     <color name="colorSecondary">#E74A31</color>
     <color name="colorGray">#505050</color>
     <color name="witheAlt">#FEF7FF</color>
+    <color name="colorItemBookDivider">#E0E0E0</color>
 </resources>
